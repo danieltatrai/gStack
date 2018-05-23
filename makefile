@@ -2,7 +2,7 @@ SHELL=/bin/bash
 
 readvar = $(shell cat .env | sed -nr 's/^$(1)=(.*)$$/\1/ p')
 
-timestamp := $(shell date +"%Y-%m-%d-%H-%M")
+timestamp := $(shell date -u +"%Y-%m-%d-%H-%M")
 usr := $(shell id -u):$(shell id -g)
 REGISTRY_URL := $(call readvar,REGISTRY_URL)
 COMPOSE_PROJECT_NAME := $(call readvar,COMPOSE_PROJECT_NAME)
@@ -43,3 +43,10 @@ push: img = $(REGISTRY_URL)/$(COMPOSE_PROJECT_NAME)
 push: build
 	docker tag $(img):latest $(img):$(timestamp)
 	docker push "$(img):$(timestamp)"
+
+.PHONY: backup
+backup:
+	docker-compose run --rm -v "$(CURDIR)/backup:/backup" django backup
+
+restore:
+	docker-compose run --rm -v "$(CURDIR)/backup:/backup" django restore
