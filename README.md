@@ -1,3 +1,7 @@
+> This repo is under development. Feel free to submit issues and
+> pull requests, clone or fork it for your own use, but be prepared
+> for some bugs and more importantly fundamental changes in the future.
+
 # gStack
 
 A Docker based Django-Postgres-Nginx boilerplate.
@@ -5,46 +9,30 @@ A Docker based Django-Postgres-Nginx boilerplate.
 ## What is this?
 
 `gStack` is a boilerplate project that can be used to set up a
-Django project stack prepared for a single-host deployment. It uses Docker
-to manage software installation and version management. Features that `gStack`
-focuses on includes:
+Django project stack that uses Docker for a single-host deployment.
+We could call it a _framework of frameworks_ or a _metaframework_. Features that `gStack` focuses on includes:
 
-* Pushing versioned images to a docker registry
+* Pushing versioned images to a docker registry (version management)
 * Handling secrets in a portable way (can be used with Swarm and Kubernetes)
 * Separating development and production environment in a clean way, so that
   live deployment is secure by default
 * Preconfigured backup and restore processes
-* Logging configuration that works well with log shipping solutions
+* Logging configuration that works well with log shipping solutions (TODO)
+* Simple and secure-by-default demo mode
 
-## Before you start
+## Before you start (an optimistic disclaimer)
 
-Using a boilerplate to start a project a enables you to start quickly and
+Using a boilerplate to bootstrap your project enables you to start quickly and
 focus on business requirements instead of infrastructural details. On the
 other hand it is crucial to understand the risks and downsides:
 
-* Update is hard. When you start a project based on a template, you clone
+* **Update is hard**. When you start a project based on a template, you
   clone it and start adding code to it. Changes made to the original repo
   can not be merged in to the one you are working on. Even if you could, modified
   settings, some extra code you put here and there would most probably break
-  such a merge. We might find a more robust solution for this problem in the
-  future but until then it is something you have to accept. Here we list
-  some concepts to deal with this particular problem:
-  * **Hooks.** We lock down core parts of the template and add places
-    where customization can be done. We provide hooks to call custom code.
-    Updates only modify core files and folders and guarantee backward compatibility
-    on a certain level.
-  * **Tooling.** The Create React App way. This is an additional layer over hooks,
-    where the core part is packed in some way and hidden from the user.
-  * **Codemods.** Each update comes with a tool (probably a script) that
-    modifies the existing project. An assumption on the validity of the project
-    to update must be made. If it was completely reorganized, the scrip won't
-    be able to identify certain parts to modify.
-  * **Documenting.** This is a requirement anyway and clearly a prerequisite to
-    a codemod solution.
-* Becomes too complex easily.
-* Hides complexity.
-* Solves problems of a certain group of people. Your problems might be very different
-  soon.
+  such a merge. The best we can do here is **providing detailed update instructions**.
+* **Becomes too complex easily**. This means that adding your extra features based on existing ones can easily break things or even worse, compromise security. We already know of some additions what _we_ needed for specific projects and _we_ think _you_ will also want to tweek around with. **For these cases we created the recipes section.** If you can not find your use case here, submitting an issue might help.
+* **Solves problems of a certain group of people**. Your problems might be very different soon. If these problems are not something that can be handled by adding a recipe and we can not help in and issue, unfortunatelly you are on your own. Good candidate for some **investigation** and a **fork**.
 
 ## Setup
 
