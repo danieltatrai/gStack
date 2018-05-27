@@ -74,4 +74,4 @@ openssl x509 -req -in certificate.csr -CA ca.crt -CAkey ca.key \
 
 proc_file -c 0:0:600 certificate.crt /project_root/.secrets/nginx/certificate.crt
 proc_file -c 0:0:600 certificate.key /project_root/.secrets/nginx/certificate.key
-proc_file -c 0:0:666 ca.crt /project_root/ca.crt
+proc_file -c 0:0:666 ca.crt /project_root/.secrets/ca.crt
