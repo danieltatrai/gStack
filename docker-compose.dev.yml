@@ -19,3 +19,4 @@ services:
     volumes:
       - "./docker/main/copy:/copy"
       - "./docker/utils.sh:/utils.sh"
+      - "./docs:/docs"

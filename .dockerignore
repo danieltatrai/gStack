@@ -2,3 +2,5 @@
 .env
 .secrets
 static/.gitignore
+docs/source
+docs/.gitignore
