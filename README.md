@@ -4,80 +4,68 @@
 
 # gStack
 
-A Docker based Django-Postgres-Nginx boilerplate.
+A Docker based full stack Django-Postgres-Nginx project
+skeleton to build web applications.
 
-## What is this?
+It is built for those who
 
-`gStack` is a boilerplate project that can be used to set up a
-Django based web application stack based on Docker for a single-host
-deployment. We could call it a _framework of frameworks_ or a _metaframework_.
-Features that `gStack` focuses on includes:
+* creates web apps in Django
+* likes (almost) identical development and production environments
+* wants production setup to be easy but secure
+* has a reasonable knowledge of Docker
 
-* Pushing versioned images to a docker registry (version management)
-* Handling secrets in a portable way (can be used with Swarm and Kubernetes)
-* Separating development and production environment in a clean way
-* Preconfigured backup and restore processes
-* Logging configuration that works well with log shipping solutions (TODO)
-* Simple and secure-by-default demo mode
+# Quick Start for Developers
 
-## Before you start (an optimistic disclaimer)
+You will need `Docker`, `Docker Compose` and `make` installed.
 
-Using a boilerplate to bootstrap your project enables you to start quickly and
-focus on business requirements instead of infrastructural details. On the
-other hand it is crucial to understand the risks and downsides:
+1.  Clone the repository
 
-* **Update is hard**.
-  When you start a project based on a template, you
-  clone it and start adding code to it. Changes made to the original repo
-  can not be merged in to the one you are working on. Even if you could,
-  modified settings, some extra code you put here and there would most
-  probably break such a merge.
-  The best we can do here is **providing detailed update instructions**.
-* **Becomes too complex easily**.
-  This means that adding your extra features based on existing ones can
-  easily break things or even worse, compromise security. We already
-  know of some additions what _we_ needed for specific projects
-  and _we_ think _you_ will also want to tweek around with.
-  **For these cases we created the recipes section.** If you can not find
-  your use case here, submitting an issue might help.
-* **Solves problems of a certain group of people**.
-  Your problems might be very different soon. If these problems are not
-  something that can be handled by adding a recipe and we can not help in an
-  issue, unfortunatelly you are on your own.
-  Good candidate for some **investigation** and a **fork**.
+    ```sh
+    git clone https://github.com/galaktika-solutions/gStack.git myproject
+    cd myproject
+    rm -rf .git
+    git init
+    ```
 
-## Setup
+1.  Configure you project by creating a `.env` file in the project's root directory
+    _(The values here are just examples. Go on with it now, but you have to
+    change them soon.)_
 
-### Development
+    ```env
+    COMPOSE_FILE=docker-compose.yml:docker-compose.dev.yml
+    DEV_MODE=true
+    INSECURE_FILES_ALLOWED=true
 
-* Clone the repo, change upstream (from now on, it is a new project)
-* Modify `.env` (see below)
-* Add secrets (see below)
-* Start working
-* `make push` when ready
+    COMPOSE_PROJECT_NAME=myproject
+    IMAGE_NAME_PREFIX=docker-registry:5000/myproject
+    IMAGE_TAG=latest
+    NETWORK_SUBNET=10.7.10.0/24
 
-### Production
+    HOST_NAME=myproject.dev
 
-* Create `.env` with appropriate values
-* Add the compose file (`docker-compose.yml`)
-* Add secrets
-* `docker-compose pull`, `docker-compose up`
+    # These variables only need at build time
+    # Use them in build and development environments
+    VERSION=0.1
+    VERBOSE_PROJECT_NAME=myProject
+    ```
 
-## `.env`
+1.  Set up your secrets (see [Secrets](#secrets-the-secrerts-directory))
 
-See below the list of configuration items provided to `docker-compose` and
-all container as environment variables.
+# Manual
+
+## Configuration (the `.env` file)
+
+This file is in `env` format. Docker Compose will automatically see these
+variables, as well as all containers. `make` also reads some of them.
+You can freely add configuration to your project by placing variables here,
+but it is crucial for these values not to be confidential. _The variables
+in the `.env` file will be seen by virtually everybody._
 
 ###### `COMPOSE_FILE`
 
-This key is used only by `docker-compose`.
-
-* In development set it to `docker-compose.yml:docker-compose.dev.yml` (the default)
-* In production set to `docker-compose.yml`, or delete it at all.
-
 ## Secrets (the `.secrets` directory)
 
-The secrets
+## Setup for Production
 
 ```sh
 docker pull galaktikasolutions/gstack-main
@@ -94,3 +82,5 @@ docker run --rm -it -v "$(pwd):/project_root" \
   -e "COMPOSE_PROJECT_NAME=gstackdemo" \
   galaktikasolutions/gstack-main demo_setup
 ```
+
+# Recipes
