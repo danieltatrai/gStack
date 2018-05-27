@@ -5,6 +5,7 @@ readvar = $(shell cat .env | sed -nr 's/^$(1)=(.*)$$/\1/ p')
 timestamp := $(shell date -u +"%Y-%m-%d-%H-%M")
 usr := $(shell id -u):$(shell id -g)
 IMAGE_NAME_PREFIX := $(call readvar,IMAGE_NAME_PREFIX)
+VERSION := $(call readvar,VERSION)
 
 # self documenting makefile
 .DEFAULT_GOAL := help
@@ -43,7 +44,9 @@ build:
 push: img = $(IMAGE_NAME_PREFIX)-main
 push: build
 	docker tag $(img):latest $(img):$(timestamp)
+	docker tag $(img):latest $(img):$(VERSION)
 	docker push "$(img):$(timestamp)"
+	docker push "$(img):$(VERSION)"
 	docker push "$(img):latest"
 
 .PHONY: backup
