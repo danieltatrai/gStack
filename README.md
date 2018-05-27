@@ -41,7 +41,7 @@ You will need `Docker`, `Docker Compose` and `make` installed.
     IMAGE_TAG=latest
     NETWORK_SUBNET=10.7.10.0/24
 
-    HOST_NAME=myproject.dev
+    HOST_NAME=localhost
 
     # These variables only need at build time
     # Use them in build and development environments
@@ -49,21 +49,43 @@ You will need `Docker`, `Docker Compose` and `make` installed.
     VERBOSE_PROJECT_NAME=myProject
     ```
 
-1.  Set up your secrets (see [Secrets](#secrets-the-secrerts-directory))
+1.  Set up your secrets (see [Secrets](#secrets-the-secrets-directory))
+
+1.  Run `make build` in the project root. This will build the docker images.
+
+1.  Run `docker-compose up`. Your empty project runs in development mode.
+    Visit `localhost` in the browser. You need to add the certificate authority
+    certificate to the browser. _(TODO: clarify `ca.crt` and reference setup)_
+
+1.  Do some work. Run `docker-compose run --rm django django-admin ...` command
+    when needed.
+
+1.  Check and set the [`VERSION`](#verion) config value and run `make push`.
+    This will build you images and push them to the configured docker registry.
 
 # Manual
 
 ## Configuration (the `.env` file)
 
 This file is in `env` format. Docker Compose will automatically see these
-variables, as well as all containers. `make` also reads some of them.
+variables, as well as all containers
+(see `env_file` entries in `docker-compose.yml`).
+`make` also reads some of them.
 You can freely add configuration to your project by placing variables here,
 but it is crucial for these values not to be confidential. _The variables
 in the `.env` file will be seen by virtually everybody._
 
 ###### `COMPOSE_FILE`
 
+In development mode set it to `docker-compose.yml:docker-compose.dev.yml`.
+In production mode, do not set it at all (delete the line or comment it out).
+Only Docker Compose uses this value.
+
 ## Secrets (the `.secrets` directory)
+
+## The `makefile`
+
+## Development and Production Modes
 
 ## Setup for Production
 
