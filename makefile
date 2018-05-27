@@ -38,6 +38,10 @@ build:
 	IMAGE_TAG=latest docker-compose run -v "$(CURDIR)/static:/static" --rm django django-admin collectstatic --no-input -c
 	echo "*" > static/.gitignore && echo "!.gitignore" >> static/.gitignore
 	chmod 775 static
+	# documentation
+	rm -rf docs/build
+	IMAGE_TAG=latest docker-compose run --rm -u $(usr) -v "$(CURDIR)/docs:/docs" -w "/docs" django sphinx-build -M html /docs/source /docs/build
+	# final build
 	IMAGE_TAG=latest COMPOSE_FILE="docker-compose.yml:docker-compose.dev.yml" docker-compose build
 	docker-compose down
 
