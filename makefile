@@ -31,10 +31,11 @@ run-as-me:
 ## Build production docker images
 build:
 	docker-compose down
-	mkdir -p static
-	chmod 777 static
+	# initial build
 	IMAGE_TAG=latest COMPOSE_FILE="docker-compose.yml:docker-compose.dev.yml" docker-compose build
-	docker-compose run -v "$(CURDIR)/static:/static" --rm django django-admin collectstatic --no-input -c
+	# static files
+	chmod 777 static
+	IMAGE_TAG=latest docker-compose run -v "$(CURDIR)/static:/static" --rm django django-admin collectstatic --no-input -c
 	echo "*" > static/.gitignore && echo "!.gitignore" >> static/.gitignore
 	chmod 775 static
 	IMAGE_TAG=latest COMPOSE_FILE="docker-compose.yml:docker-compose.dev.yml" docker-compose build
