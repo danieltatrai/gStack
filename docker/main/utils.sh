@@ -11,10 +11,22 @@ ask_user() {
     return 1
   fi
 
-  i=0; for o in "$@"; do echo -e "$i\t$o" >&2; i=$((i+1)); done; echo >&2
+  i=0
+  for o in "$@"; do
+    if [ "$o" = "$DEFAULT_ANSWER" ]; then
+      echo -e "$i *\t$o" >&2
+    else
+      echo -e "$i\t$o" >&2
+    fi
+    i=$((i+1))
+  done
+  echo >&2
 
   while true; do
     read -p "Enter a number in range 0-$(($# - 1)): " -r r
+    if [ -z "$r" ] && [ -n "$DEFAULT_ANSWER" ]; then
+      echo "$DEFAULT_ANSWER"; return
+    fi
     i=0; for o in "$@"; do
       if [ "$r" = "$i" ]; then echo "$o"; return; fi; i=$((i+1))
     done
@@ -24,15 +36,36 @@ ask_user() {
 # createsecret [-f|-r] SECRET param
 #   * -f: create secret from a file; param is the filename
 #   * -r: random string; param is the length
+#   * -s: read from STDIN
 #   * no option; param should be the value
 createsecret() {
   local fn='/src/.secret.env'
+  if [ -n "$SECRET_FILE_PATH" ]; then fn="$SECRET_FILE_PATH"; fi
   local value replace
+  local replace_requested="$3"
+  case "$1" in
+    -f)
+      shift
+      value="$(base64 -w0 "$2")"
+      ;;
+    -r)
+      shift
+      value="$(</dev/urandom tr -dc '[:graph:]' | head -c "$2" | base64 -w0)"
+      ;;
+    -s)
+      shift
+      # read -r value
+      value=$(base64 -w0)
+      replace_requested="$2"
+      ;;
+    *)
+      value="$(echo -n "$2" | base64 -w0)"
+  esac
 
   # check if the secret exists
   while IFS= read -r p; do
     if [ "$(echo "$p" | sed -rn 's/^([^#=\s]*)=(.*)$/\1/p')" = "$1" ]; then
-      if [ -n "$3" ]; then
+      if [ -n "$replace_requested" ]; then
         replace=1
       else
         echo "Secret already exists: $1" >&2; return 1
@@ -43,21 +76,7 @@ createsecret() {
   if [ -n "$replace" ]; then
     sed -ri "/^($1=).*$/d" "$fn"
   fi
-
-  case "$1" in
-    -f)
-      shift
-      value="$(base64 -w0 "$2")"
-      ;;
-    -r)
-      shift
-      value="$(</dev/urandom tr -dc '[:graph:]' | head -c "$2" | base64 -w0)"
-      ;;
-    *)
-      value="$(echo -n "$2" | base64 -w0)"
-    esac
-
-    echo "$1=$value" >> "$fn"
+  echo "$1=$value" >> "$fn"
 }
 
 decodeline() {
@@ -67,7 +86,7 @@ decodeline() {
 # readsecret SECRET [filename owner:group mode]
 readsecret() {
   local fn='/.secret.env'
-  local value
+  if [ -n "$SECRET_FILE_PATH" ]; then fn="$SECRET_FILE_PATH"; fi
 
   while IFS= read -r p; do
     if [ "$(echo "$p" | sed -rn 's/^([^#=]*)=(.*)$/\1/p')" = "$1" ]; then
@@ -102,9 +121,9 @@ prepare_django() {
 
   # the django postgres client looks for these certs in ~/.postgresql
   mkdir -p /home/django/.postgresql
-  readsecret CERTIFICATE_KEY /home/django/.postgresql/postgresql.key django:django 400
-  readsecret CERTIFICATE_CRT /home/django/.postgresql/postgresql.crt django:django 400
-  readsecret CERTIFICATE_CACERT /home/django/.postgresql/root.crt django:django 400
+  readsecret PG_CERTIFICATE_KEY /home/django/.postgresql/postgresql.key django:django 400
+  readsecret PG_CERTIFICATE_CRT /home/django/.postgresql/postgresql.crt django:django 400
+  readsecret PG_CERTIFICATE_CACERT /home/django/.postgresql/root.crt django:django 400
 
   # make sure files and directories permissions are correct by setting the setgid bit
   # the other part of the story is settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS

@@ -4,7 +4,7 @@ set -e
 common_name="$COMPOSE_PROJECT_NAME"
 san="DNS:$HOST_NAME,IP:$SERVER_IP"
 
-rm -rf *.{crt,key,csr}
+rm -rf *.{crt,key,csr,srl}
 
 # generate CA private key
 openssl genrsa -out ca.key 2048
@@ -29,7 +29,7 @@ openssl x509 -req -in certificate.csr -CA ca.crt -CAkey ca.key \
         -extfile <(cat /etc/ssl/openssl.cnf \
                    <(printf "[SAN]\nsubjectAltName=%s" "$san"))
 
-rm certificate.csr
+rm certificate.csr ca.srl ca.key
 
 # # client cert for the browser
 # openssl pkcs12 -export -clcerts -in certificate.crt -inkey certificate.key \

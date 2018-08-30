@@ -15,10 +15,9 @@ build:
 	$(devcompose) docker-compose build
 	$(devcompose) docker-compose run --rm build_js npm install
 	$(devcompose) docker-compose run --rm build_js npm run build
-	# $(devcompose) docker-compose run --rm django django-admin createcachetable
 	$(devcompose) docker-compose run --rm django collectstatic
-	# $(devcompose) docker-compose run --rm -e 'VERSION=$(timestamp)' django docs
 	cp -R js_client/build/ static
+	echo -n "$(timestamp)" > conf/VERSION
 	$(devcompose) docker-compose build
 	$(devcompose) docker-compose down
 

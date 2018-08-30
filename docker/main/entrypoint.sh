@@ -28,9 +28,9 @@ if [ "$1" = 'postgres' ]; then
   chmod 400 "$PGDATA/postgresql.conf"
 
   # put these files where they are needed
-  readsecret CERTIFICATE_KEY /server.key postgres:postgres 400
-  readsecret CERTIFICATE_CRT /server.crt postgres:postgres 400
-  readsecret CERTIFICATE_CACERT /ca.crt postgres:postgres 400
+  readsecret PG_CERTIFICATE_KEY /server.key postgres:postgres 400
+  readsecret PG_CERTIFICATE_CRT /server.crt postgres:postgres 400
+  readsecret PG_CERTIFICATE_CACERT /ca.crt postgres:postgres 400
 
   # read needed variables to fail early
   DB_PASSWORD="$(readsecret DB_PASSWORD)"
@@ -75,8 +75,8 @@ if [ "$1" = 'django' ]; then
 fi
 ################################################################################
 if [ "$1" = 'nginx' ]; then
-  readsecret CERTIFICATE_KEY /certificate.key 0:0 400
-  readsecret CERTIFICATE_CRT /certificate.crt 0:0 400
+  readsecret SITE_CERTIFICATE_KEY /certificate.key 0:0 400
+  readsecret SITE_CERTIFICATE_CRT /certificate.crt 0:0 400
 
   if [ "$ENV" = 'DEV' ]; then
     conf=/src/conf/nginx.dev.conf
@@ -106,6 +106,13 @@ if [ "$1" = 'with_django' ]; then
   shift
   prepare_django
   exec docker/gprun.py -u django -s SIGINT "$@"
+fi
+
+################################################################################
+if [ "$1" = 'django-admin' ]; then
+  shift
+  prepare_django
+  exec docker/gprun.py -u django -s SIGINT django-admin "$@"
 fi
 
 ################################################################################
@@ -147,6 +154,12 @@ if [ "$1" = 'restore' ]; then
   else
     restore "$typ"
   fi
+  exit 0
+fi
+
+################################################################################
+if [ "$1" = 'setupcheck' ]; then
+  /src/docker/main/setupcheck.sh
   exit 0
 fi
 
