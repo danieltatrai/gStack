@@ -3,12 +3,15 @@
 from django.urls import path, include
 from django.contrib import admin
 from django.conf import settings
+from .routers import ContainerRouter
 
 # Project imports
 from .views import KeyValueStoreApiView
 
+router = ContainerRouter()
+
 api_patterns = [
-    # path('^', include(router.urls)),
+    path('', include(router.urls)),
     path('key_value_store/', KeyValueStoreApiView.as_view()),
 ]
 
